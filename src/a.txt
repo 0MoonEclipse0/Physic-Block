@@ -1,0 +1,87 @@
+char vertshadercontent[1028];
+    vertShaderSource = readShader("shaders/shader.vert",vertshadercontent ,1028);
+    char fragshadercontent[1028];
+    fragShaderSource = readShader("shaders/shader.frag",fragshadercontent ,1028);
+
+    // Defining the verticies
+    float verts[] = {
+        -0.5f, -0.5f, 0.0f,
+        0.5f, -0.5f, 0.0f,
+        0.0f,  0.5f, 0.0f
+    };
+
+    // Creating the VBO
+    unsigned int VBO;
+    glGenBuffers(1, &VBO);
+
+    // Creating the VAO
+    unsigned int VAO;
+    glGenVertexArrays(1, &VAO);
+
+    // Binding and filling the VAO
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts),verts, GL_STATIC_DRAW);
+
+    // Creating the vertex and fragment shaders
+    unsigned int vertShader;
+    unsigned int fragShader;
+    vertShader = glCreateShader(GL_VERTEX_SHADER);
+    fragShader = glCreateShader(GL_FRAGMENT_SHADER);
+
+    // Giving the vertex and fragment shaders a source
+    glShaderSource(vertShader, 1, &vertShaderSource, NULL);
+    glShaderSource(fragShader, 1, &fragShaderSource, NULL);
+    glCompileShader(vertShader);
+    glCompileShader(fragShader);
+
+    // Check if Shaders are compiled
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vertShader, GL_COMPILE_STATUS, &success);
+    glGetShaderiv(fragShader, GL_COMPILE_STATUS, &success);
+
+    if (!success) {
+        glGetShaderInfoLog(vertShader, 512, NULL, infoLog);
+        fprintf(stderr, "Shader compilation failed");
+    }
+
+    // Creating the shader-program
+    unsigned int shaderProgram;
+    shaderProgram = glCreateProgram();
+
+    glAttachShader(shaderProgram, vertShader);
+    glAttachShader(shaderProgram, fragShader);
+    glLinkProgram(shaderProgram);
+
+    // Error checking for the shader-program
+    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
+    if (!success) {
+        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
+        fprintf(stderr, "ShaderProgram Failed");
+    }
+
+    // Use the shader-program
+    glUseProgram(shaderProgram);
+    glDeleteShader(vertShader);
+    glDeleteShader(fragShader);
+
+    // Linking vertex-attributes
+    glVertexAttribPointer(0,3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Enabling the vertex-attributes
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    glUseProgram(shaderProgram);
+
+    glBindVertexArray(VAO);
+
+    glBIndBuffer(GL_ARRAY_BUFFER, VBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verts),verts, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (void*)0);
+    glEnableVertexAttribArray(0);
